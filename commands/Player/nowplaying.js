@@ -1,4 +1,4 @@
-const { SlashCommandBuilder } = require("@discordjs/builders");
+const { SlashCommandBuilder, inlineCode } = require("@discordjs/builders");
 const { MessageEmbed } = require("discord.js");
 const { splitBar } = require("string-progressbar");
 const { randomColor } = require("../../utils/colors");
@@ -32,11 +32,13 @@ module.exports = {
     if (songDuration > 0) {
       embed.addField(
         "\u200b",
-        new Date(seek).toISOString().substr(11, 8) +
-          "[" +
-          splitBar(songDuration == 0 ? seek : songDuration, seek, 10)[0] +
-          "]" +
-          (songDuration == 0 ? " ◉ LIVE" : new Date(songDuration).toISOString().substr(11, 8)),
+        inlineCode(
+          new Date(seek).toISOString().substr(11, 8) +
+            "[" +
+            splitBar(songDuration == 0 ? seek : songDuration, seek, 14)[0] +
+            "]" +
+            (songDuration == 0 ? " ◉ LIVE" : new Date(songDuration).toISOString().substr(11, 8))
+        ),
         false
       );
 

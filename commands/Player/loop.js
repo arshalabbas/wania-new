@@ -1,4 +1,5 @@
 const { SlashCommandBuilder } = require("@discordjs/builders");
+const { canModifyQueue, errorEmbed } = require("../../utils/global");
 
 const data = new SlashCommandBuilder().setName("loop").setDescription("loop the entire queue");
 
@@ -7,14 +8,11 @@ module.exports = {
   async execute(client, interaction) {
     const serverQueue = client.queue.get(interaction.guild.id);
 
-    const { channel } = interaction.member.voice;
-    const botChannel = interaction.guild.me.voice.channel;
-
     if (!serverQueue)
       return await interaction.reply({ embeds: [errorEmbed("Nothing playing right now.")] });
 
-    if (channel !== botChannel)
-      return await interaction.reply({
+    if (!canModifyQueue(interaction))
+      return interaction.reply({
         embeds: [errorEmbed(`You must be in the same channel as <@${client.user.id}>`)],
       });
 

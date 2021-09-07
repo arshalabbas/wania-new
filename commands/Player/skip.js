@@ -9,16 +9,11 @@ module.exports = {
   async execute(client, interaction) {
     const serverQueue = client.queue.get(interaction.guild.id);
 
-    const { channel } = interaction.member.voice;
-    const botChannel = interaction.guild.me.voice.channel;
-
     if (!serverQueue)
       return await interaction.reply({ embeds: [errorEmbed("Nothing playing right now.")] });
 
-    if (channel !== botChannel)
-      return await interaction.reply({
-        embeds: [errorEmbed(`You must be in the same channel as <@${client.user.id}>`)],
-      });
+    if (!canModifyQueue(interaction))
+      return { embeds: [errorEmbed(`You must be in the same channel as <@${client.user.id}>`)] };
 
     serverQueue.playing = true;
     serverQueue.player.stop();

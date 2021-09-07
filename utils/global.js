@@ -24,4 +24,12 @@ module.exports = {
 
     return embed;
   },
+  canModifyQueue: (interaction) => {
+    const { channel } = interaction.member.voice;
+    const botChannel = interaction.guild.me.voice.channel;
+
+    if (channel !== botChannel) return;
+
+    return true;
+  },
 };
