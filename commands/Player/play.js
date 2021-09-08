@@ -3,7 +3,7 @@ const { MessageEmbed } = require("discord.js");
 const { getVoiceConnection } = require("@discordjs/voice");
 const ytdl = require("ytdl-core");
 const YouTube = require("youtube-sr").default;
-const { errorEmbed, images } = require("../../utils/global");
+const { errorEmbed, images, canModifyQueue } = require("../../utils/global");
 const { randomColor } = require("../../utils/colors");
 const musicPlayer = require("../../utils/musicPlayer");
 
@@ -11,7 +11,7 @@ const data = new SlashCommandBuilder()
   .setName("play")
   .setDescription("play songs in voice channel")
   .addStringOption((option) =>
-    option.setName("song").setDescription("Enter the song title or url").setRequired(true)
+    option.setName("search").setDescription("Enter the song title or url").setRequired(true)
   );
 
 module.exports = {
@@ -21,10 +21,19 @@ module.exports = {
 
     const serverQueue = client.queue.get(interaction.guild.id);
 
-    const search = interaction.options.getString("song");
+    if (serverQueue && !canModifyQueue(interaction))
+      return await interaction.reply({
+        embeds: [errorEmbed(`You must be in the same channel as <@${client.user.id}>`)],
+        ephemeral: true,
+      });
+
+    const search = interaction.options.getString("search");
     const videoPattern = /^(https?:\/\/)?(www\.)?(m\.)?(youtube\.com|youtu\.?be)\/.+$/gi;
-    //const playlistPattern = /^.*(list=)([^#\&\?]*).*/gi;
+    const playlistPattern = /^.*(list=)([^#\&\?]*).*/gi;
     const urlValid = videoPattern.test(search);
+
+    if (!urlValid && playlistPattern.test(search))
+      return client.commands.get("playlist").execute(client, interaction);
 
     let song = null;
     let songInfo = null;

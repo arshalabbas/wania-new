@@ -55,7 +55,7 @@ async function musicPlayer(client, song, interaction) {
     metadata: {
       title: song.title,
       url: song.url,
-      requestedId: song.requested.id,
+      requestedId: "751736021661778004",
     },
   });
   const player = createAudioPlayer({
