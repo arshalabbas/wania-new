@@ -10,6 +10,9 @@ client.radioClient = radioClient;
 client.commands = new Collection();
 client.queue = new Map();
 
+//deploying all commands
+require("./deploy-commands");
+
 //event handler
 const eventFiles = fs.readdirSync(join(__dirname, "events")).filter((file) => file.endsWith(".js"));
 for (const file of eventFiles) {

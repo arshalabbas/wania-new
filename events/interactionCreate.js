@@ -1,3 +1,5 @@
+const { errorEmbed } = require("../utils/global");
+
 module.exports = {
   name: "interactionCreate",
   async execute(interaction) {
@@ -8,6 +10,9 @@ module.exports = {
     if (!command) return;
 
     try {
+      if (command.developer && interaction.user.id !== "751736021661778004")
+        return interaction.reply({ embeds: [errorEmbed("You can't use this command.")] });
+
       command.execute(interaction.client, interaction);
     } catch (error) {
       await interaction.reply({

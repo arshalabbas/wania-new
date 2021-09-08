@@ -1,6 +1,6 @@
 const { MessageEmbed } = require("discord.js");
 const colors = require("./colors");
-const { redCross } = require("./emojies");
+const { redCross, seek } = require("./emojies");
 
 const images = {
   wania: "https://i.ibb.co/W6hK79j/mimo-logo.png",
@@ -31,5 +31,16 @@ module.exports = {
     if (channel !== botChannel) return;
 
     return true;
+  },
+  seekBar: (total, current, length = 10) => {
+    const percent = (current / total) * 100;
+    let filled = "";
+    let unfilled = "";
+    for (let i = 0; i < length; i++) {
+      if (percent >= (100 / length) * (i + 1)) filled += seek.filled;
+      else unfilled += seek.unfilled;
+    }
+
+    return seek.opening + filled + seek.point + unfilled + seek.closing;
   },
 };
