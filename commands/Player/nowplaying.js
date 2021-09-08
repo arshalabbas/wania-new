@@ -21,6 +21,8 @@ module.exports = {
     const songDuration = parseInt(song.duration) * 1000;
     const left = songDuration - seek;
 
+    console.log(song);
+
     const embed = new MessageEmbed()
       .setAuthor("Now playing", images.waniaSwing)
       .setTitle(song.title)

@@ -29,11 +29,10 @@ module.exports = {
 
     const search = interaction.options.getString("search");
     const videoPattern = /^(https?:\/\/)?(www\.)?(m\.)?(youtube\.com|youtu\.?be)\/.+$/gi;
-    const playlistPattern = /^.*(list=)([^#\&\?]*).*/gi;
+    const playlistPattern = YouTube.isPlaylist(search); //^.*(list=)([^#\&\?]*).*/gi;
     const urlValid = videoPattern.test(search);
 
-    if (!urlValid && playlistPattern.test(search))
-      return client.commands.get("playlist").execute(client, interaction);
+    if (playlistPattern) return client.commands.get("playlist").execute(client, interaction);
 
     let song = null;
     let songInfo = null;

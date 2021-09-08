@@ -5,6 +5,7 @@ const YouTube = require("youtube-sr").default;
 const ytdl = require("ytdl-core");
 const musicPlayer = require("../../utils/musicPlayer");
 const { randomColor } = require("../../utils/colors");
+const { getVoiceConnection } = require("@discordjs/voice");
 
 const data = new SlashCommandBuilder()
   .setName("playlist")
@@ -68,7 +69,7 @@ module.exports = {
       return console.error(error);
     }
 
-    const newSongs = videos
+    const allSongsDetails = videos
       .filter((video) => video.title !== "Private video" && video.title !== "Deleted video")
       .map(async (video) => {
         const songInfo = (await ytdl.getInfo(video.url)).videoDetails;
@@ -80,6 +81,12 @@ module.exports = {
           requested: interaction.user,
         });
       });
+
+    let newSongs = [];
+
+    for (i = 0; i <= allSongsDetails.length; i++) {
+      newSongs.push(await allSongsDetails[i]);
+    }
 
     const queueConstruct = {
       textChannel: interaction.channel,
@@ -105,13 +112,16 @@ module.exports = {
 
     await interaction.editReply({ embeds: [embed] });
 
-    try {
-      musicPlayer(client, queueConstruct.songs[0], interaction);
-    } catch (error) {
-      console.error(error);
-      client.queue.delete(interaction.guild.id);
-      const connection = getVoiceConnection(interaction.guild.id);
-      if (connection) connection.destroy();
+    if (!serverQueue) {
+      client.queue.set(interaction.guild.id, queueConstruct);
+      try {
+        musicPlayer(client, queueConstruct.songs[0], interaction);
+      } catch (error) {
+        console.error(error);
+        client.queue.delete(interaction.guild.id);
+        const connection = getVoiceConnection(interaction.guild.id);
+        if (connection) connection.destroy();
+      }
     }
   },
 };

@@ -1,5 +1,5 @@
 const { SlashCommandBuilder } = require("@discordjs/builders");
-const { errorEmbed } = require("../../utils/global");
+const { errorEmbed, canModifyQueue } = require("../../utils/global");
 
 const data = new SlashCommandBuilder().setName("resume").setDescription("resume the paused music");
 

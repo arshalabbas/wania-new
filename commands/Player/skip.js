@@ -1,4 +1,5 @@
 const { SlashCommandBuilder } = require("@discordjs/builders");
+const { canModifyQueue, errorEmbed } = require("../../utils/global");
 
 const data = new SlashCommandBuilder()
   .setName("skip")
