@@ -2,10 +2,12 @@ const { SlashCommandBuilder } = require("@discordjs/builders");
 const { MessageEmbed } = require("discord.js");
 const { getVoiceConnection } = require("@discordjs/voice");
 const ytdl = require("ytdl-core");
+const Spotify = require("spotify-info.js").Spotify;
 const YouTube = require("youtube-sr").default;
 const { errorEmbed, images, canModifyQueue } = require("../../utils/global");
 const { randomColor } = require("../../utils/colors");
 const musicPlayer = require("../../utils/musicPlayer");
+const { spotifyClientId, spotifyToken } = require("../../config");
 
 const data = new SlashCommandBuilder()
   .setName("play")
@@ -29,11 +31,20 @@ module.exports = {
 
     const search = interaction.options.getString("search");
     const videoPattern = /^(https?:\/\/)?(www\.)?(m\.)?(youtube\.com|youtu\.?be)\/.+$/gi;
-    const playlistPattern = YouTube.isPlaylist(search); //^.*(list=)([^#\&\?]*).*/gi;
+    const playlistPattern = YouTube.isPlaylist(search);
+    const spotifyPattern = /(?<=https:\/\/open\.spotify\.com\/track\/)([a-zA-Z0-9]{15,})/g;
+    const spotifyPlaylistPattern =
+      /(?<=https:\/\/open\.spotify\.com\/playlist\/)([a-zA-Z0-9]{15,})/g;
+    const spotifyAlbumPattern = /(?<=https:\/\/open\.spotify\.com\/album\/)([a-zA-Z0-9]{15,})/g;
+    // validations
     const urlValid = videoPattern.test(search);
+    const spotifyUrl = spotifyPattern.test(search);
 
-    if (playlistPattern) return client.commands.get("playlist").execute(client, interaction);
-
+    if (playlistPattern) {
+      return client.commands.get("playlist").execute(client, interaction);
+    } else if (spotifyPlaylistPattern.test(search)) {
+      return client.commands.get("playlist").execute(client, interaction);
+    }
     let song = null;
     let songInfo = null;
 
@@ -45,35 +56,56 @@ module.exports = {
         song = {
           title: songInfo.title,
           url: songInfo.video_url,
+          artist: songInfo.media.artist,
           duration: songInfo.lengthSeconds,
           thumbnail: songInfo.thumbnails[3].url,
-          requested: interaction.user,
         };
       } catch (error) {
-        console.error(error);
-        return await interaction.editReply({ embeds: [errorEmbed("something went wrong ;-;")] });
+        console.error(error.message);
+        return await interaction.editReply({
+          embeds: [errorEmbed("something went wrong ;-;\n`maybe your url is not valid`")],
+        });
+      }
+    } else if (spotifyUrl) {
+      try {
+        const spotify = new Spotify({ clientID: spotifyClientId, clientSecret: spotifyToken });
+        songInfo = await spotify.getTrackByURL(search);
+        song = {
+          title: songInfo.name,
+          url: songInfo.external_urls.spotify,
+          artist: songInfo.artists.map((artist) => artist.name).join(", "),
+          duration: songInfo.duration_ms / 1000,
+          thumbnail: songInfo.album.images[1].url,
+        };
+      } catch (error) {
+        console.error(error.message);
+        return await interaction.editReply({
+          embeds: [errorEmbed("Something went wrong ;-;\n`maybe your url is not valid`")],
+        });
       }
     } else {
       try {
         const searchResult = await YouTube.searchOne(search).catch((error) => console.error(error));
         if (!searchResult)
           return await interaction.editReply({
-            embeds: [errorEmbed("No songs found with this title")],
+            embeds: [errorEmbed("No songs found with this title or url")],
           });
 
         songInfo = (await ytdl.getInfo(searchResult.url)).videoDetails;
         song = {
           title: songInfo.title,
           url: songInfo.video_url,
+          artist: songInfo.media.artist,
           duration: songInfo.lengthSeconds,
           thumbnail: songInfo.thumbnails[3].url,
-          requested: interaction.user,
         };
       } catch (error) {
-        console.error(error);
+        console.error(error.message);
         return await interaction.editReply({ embeds: [errorEmbed("Something went wrong ;-;")] });
       }
     }
+
+    song.requested = interaction.user;
 
     if (serverQueue) {
       serverQueue.songs.push(song);
@@ -87,6 +119,8 @@ module.exports = {
           `Requested by ${song.requested.tag}`,
           song.requested.displayAvatarURL({ dynamic: true })
         );
+
+      if (song.artist) embed.setDescription(`Artist - **${song.artist}**`);
 
       return await interaction.editReply({ embeds: [embed] });
     }

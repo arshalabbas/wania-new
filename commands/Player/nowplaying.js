@@ -17,11 +17,10 @@ module.exports = {
       return await interaction.reply({ embeds: [errorEmbed("Nothing playing right now.")] });
 
     const song = queue.songs[0];
+    const spSong = song.url.includes("spotify.com");
     const seek = queue.player.state.resource.playbackDuration;
     const songDuration = parseInt(song.duration) * 1000;
     const left = songDuration - seek;
-
-    console.log(song);
 
     const embed = new MessageEmbed()
       .setAuthor("Now playing", images.waniaSwing)
@@ -30,6 +29,8 @@ module.exports = {
       .setColor(randomColor())
       .setImage(song.thumbnail);
 
+    if (song.artist) embed.setDescription(`Artist - **${song.artist}**`);
+
     if (songDuration > 0) {
       embed.addField(
         inlineCode(
@@ -37,7 +38,9 @@ module.exports = {
             songDuration == 0 ? " ◉ LIVE" : new Date(songDuration).toISOString().substr(11, 8)
           }`
         ),
-        "\u200b" + seekBar(songDuration == 0 ? seek : songDuration, seek, 14) + "\u200b",
+        "\u200b" +
+          seekBar(songDuration == 0 ? seek : songDuration, seek, spSong ? 13 : 14) +
+          "\u200b",
         false
       );
 

@@ -10,6 +10,8 @@ const {
 } = require("@discordjs/voice");
 const { MessageEmbed } = require("discord.js");
 const ytdl = require("ytdl-core");
+//const spdl = require("spdl-core").default;
+const YouTube = require("youtube-sr").default;
 const { randomColor } = require("./colors");
 const { errorEmbed, images } = require("./global");
 
@@ -23,7 +25,18 @@ async function musicPlayer(client, song, interaction) {
   let stream = null;
 
   try {
-    stream = ytdl(song.url, { highWaterMark: 1 << 25, filter: "audioonly" });
+    if (song.url.includes("youtube.com")) {
+      stream = ytdl(song.url, { highWaterMark: 1 << 25, filter: "audioonly" });
+    } else if (song.url.includes("spotify.com")) {
+      const searchResult = await YouTube.searchOne(`${song.title} ${song.artist}`).catch((error) =>
+        console.error(error)
+      );
+
+      if (!searchResult)
+        return queue.textChannel.send({ embeds: [errorEmbed("No song found :,-)")] });
+
+      stream = ytdl(searchResult.url, { highWaterMark: 1 << 25, filter: "audioonly" });
+    }
   } catch (error) {
     if (queue) {
       queue.songs.shift();
@@ -82,6 +95,8 @@ async function musicPlayer(client, song, interaction) {
         `Requested by ${song.requested.tag}`,
         song.requested.displayAvatarURL({ dynamic: true })
       );
+
+    if (song.artist) embed.setDescription(`Artist - **${song.artist}**`);
 
     playingMessage = await queue.textChannel.send({ embeds: [embed] });
   });
