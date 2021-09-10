@@ -9,6 +9,7 @@ const data = new SlashCommandBuilder()
 
 module.exports = {
   data,
+  category: "Music",
   async execute(client, interaction) {
     const botChannel = interaction.guild.me.voice.channel;
     const { channel } = interaction.member.voice;

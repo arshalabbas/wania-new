@@ -18,6 +18,7 @@ const data = new SlashCommandBuilder()
 
 module.exports = {
   data,
+  category: "Music",
   async execute(client, interaction) {
     client.commands.get("join").execute(client, interaction, true);
 

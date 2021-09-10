@@ -26,7 +26,7 @@ const data = new SlashCommandBuilder()
 
 module.exports = {
   data,
-  developer: true,
+  category: "Developer",
   async execute(client, interaction) {
     const commandName = interaction.options.getString("command");
     folders.forEach((f) => {

@@ -10,6 +10,7 @@ const data = new SlashCommandBuilder()
 
 module.exports = {
   data,
+  category: "Music",
   async execute(client, interaction) {
     const queue = client.queue.get(interaction.guild.id);
 

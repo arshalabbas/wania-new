@@ -13,7 +13,7 @@ const data = new SlashCommandBuilder()
   .setName("playlist")
   .setDescription("queue all the content from the given playlist")
   .addStringOption((option) =>
-    option.setName("search").setDescription("enter the youtube playlist url").setRequired(true)
+    option.setName("search").setDescription("enter the playlist url").setRequired(true)
   )
   .addNumberOption((option) =>
     option
@@ -23,6 +23,7 @@ const data = new SlashCommandBuilder()
 
 module.exports = {
   data,
+  category: "Music",
   async execute(client, interaction) {
     client.commands.get("join").execute(client, interaction, true);
 
@@ -125,7 +126,7 @@ module.exports = {
       playlist = {
         title: playlist.name,
         url: playlist.external_urls.spotify,
-        thumbnail: playlist.images[1].url,
+        thumbnail: playlist.images[0].url,
       };
     } else if (spotifyAlbum) {
       videos = playlist.tracks.items.slice(0, size).map((song) => {
@@ -142,7 +143,7 @@ module.exports = {
       playlist = {
         title: playlist.name,
         url: playlist.external_urls.spotify,
-        thumbnail: playlist.images[1].url,
+        thumbnail: playlist.images[0].url,
       };
     }
 

@@ -8,6 +8,7 @@ const data = new SlashCommandBuilder().setName("ping").setDescription("show bot'
 
 module.exports = {
   data,
+  category: "Bot",
   async execute(client, interaction) {
     await interaction.deferReply();
 

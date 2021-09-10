@@ -28,8 +28,8 @@ async function musicPlayer(client, song, interaction) {
     if (song.url.includes("youtube.com")) {
       stream = ytdl(song.url, { highWaterMark: 1 << 25, filter: "audioonly" });
     } else if (song.url.includes("spotify.com")) {
-      const searchResult = await YouTube.searchOne(`${song.title} ${song.artist}`).catch((error) =>
-        console.error(error)
+      const searchResult = await YouTube.searchOne(`${song.title} ${song.artist} audio`).catch(
+        (error) => console.error(error)
       );
 
       if (!searchResult)

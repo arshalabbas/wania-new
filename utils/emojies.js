@@ -13,4 +13,10 @@ module.exports = {
     unfilled: "<:unfilled_bar:885087490334154802>",
     point: "<:seek_point:885087490321551410>",
   },
+  queue: {
+    first: "<:first:885788808853999616>",
+    last: "<:last:885788807872520214>",
+    next: "<:next:885821262830632991>",
+    prev: "<:prev:885821262281187359>",
+  },
 };

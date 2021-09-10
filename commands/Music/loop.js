@@ -5,6 +5,7 @@ const data = new SlashCommandBuilder().setName("loop").setDescription("loop the 
 
 module.exports = {
   data,
+  category: "Music",
   async execute(client, interaction) {
     const serverQueue = client.queue.get(interaction.guild.id);
 

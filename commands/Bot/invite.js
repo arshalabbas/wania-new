@@ -10,6 +10,7 @@ const data = new SlashCommandBuilder()
 
 module.exports = {
   data,
+  category: "Bot",
   async execute(client, interaction) {
     const embed = new MessageEmbed()
       .setTitle("Invite Us!")

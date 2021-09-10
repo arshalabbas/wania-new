@@ -6,6 +6,7 @@ const data = new SlashCommandBuilder().setName("uptime").setDescription("Check b
 
 module.exports = {
   data,
+  category: "Bot",
   async execute(client, interaction) {
     let seconds = Math.floor(client.uptime / 1000);
     let minutes = Math.floor(seconds / 60);
