@@ -2,10 +2,12 @@ const { SlashCommandBuilder } = require("@discordjs/builders");
 const { MessageEmbed } = require("discord.js");
 const { errorEmbed, canModifyQueue } = require("../../utils/global");
 const YouTube = require("youtube-sr").default;
+const Spotify = require("spotify-info.js").Spotify;
 const ytdl = require("ytdl-core");
 const musicPlayer = require("../../utils/musicPlayer");
 const { randomColor } = require("../../utils/colors");
 const { getVoiceConnection } = require("@discordjs/voice");
+const { spotifyClientId, spotifyToken } = require("../../config");
 
 const data = new SlashCommandBuilder()
   .setName("playlist")
@@ -41,13 +43,12 @@ module.exports = {
       });
 
     const search = interaction.options.getString("search");
-    const validation = YouTube.isPlaylist(search);
-
-    if (!validation)
-      return await interaction.reply({
-        embeds: [errorEmbed("You need enter the valid youtube playlist url")],
-        ephemeral: true,
-      });
+    const spotifyPlaylistPattern =
+      /(?<=https:\/\/open\.spotify\.com\/playlist\/)([a-zA-Z0-9]{15,})/g;
+    const spotifyAlbumPattern = /(?<=https:\/\/open\.spotify\.com\/album\/)([a-zA-Z0-9]{15,})/g;
+    const youtubePlaylist = YouTube.isPlaylist(search);
+    const spotifyPlaylist = spotifyPlaylistPattern.test(search);
+    const spotifyAlbum = spotifyAlbumPattern.test(search);
 
     let size = null;
 
@@ -58,34 +59,91 @@ module.exports = {
 
     let playlist = null;
     let videos = [];
+    let spotify = null;
+
+    if (spotifyPlaylist || spotifyAlbum)
+      spotify = new Spotify({ clientID: spotifyClientId, clientSecret: spotifyToken });
 
     await interaction.reply({ content: `🔍 **searching:** \`${search}\`` });
 
-    try {
-      playlist = await YouTube.getPlaylist(search, { limit: size });
-      videos = playlist.videos;
-    } catch (error) {
-      await interaction.editReply({ embeds: [errorEmbed("Something went wrong ;-;")] });
-      return console.error(error);
-    }
-
-    const allSongsDetails = videos
-      .filter((video) => video.title !== "Private video" && video.title !== "Deleted video")
-      .map(async (video) => {
-        const songInfo = (await ytdl.getInfo(video.url)).videoDetails;
-        return (song = {
-          title: songInfo.title,
-          url: songInfo.video_url,
-          duration: songInfo.lengthSeconds,
-          thumbnail: songInfo.thumbnails[3].url,
-          requested: interaction.user,
-        });
-      });
+    if (youtubePlaylist) {
+      try {
+        playlist = await YouTube.getPlaylist(search, { limit: size });
+      } catch (error) {
+        await interaction.editReply({ embeds: [errorEmbed("Something went wrong ;-;")] });
+        return console.error(error.message);
+      }
+    } else if (spotifyPlaylist) {
+      try {
+        playlist = await spotify.getPlaylistByURL(search);
+      } catch (error) {
+        await interaction.editReply({ embeds: [errorEmbed("Something went wrong ;-;")] });
+        return console.error(error.message);
+      }
+    } else if (spotifyAlbum) {
+      try {
+        playlist = await spotify.getAlbumByURL(search);
+      } catch (error) {
+        await interaction.editReply({ embeds: [errorEmbed("Something went wrong ;-;")] });
+        return console.error(error.message);
+      }
+    } else return;
 
     let newSongs = [];
 
-    for (i = 0; i <= allSongsDetails.length; i++) {
-      newSongs.push(await allSongsDetails[i]);
+    if (youtubePlaylist) {
+      videos = playlist.videos;
+      const allSongsDetails = videos
+        .filter((video) => video.title !== "Private video" && video.title !== "Deleted video")
+        .map(async (video) => {
+          const songInfo = (await ytdl.getInfo(video.url)).videoDetails;
+          return (song = {
+            title: songInfo.title,
+            url: songInfo.video_url,
+            duration: songInfo.lengthSeconds,
+            artist: songInfo.media.artist,
+            thumbnail: songInfo.thumbnails[3].url,
+            requested: interaction.user,
+          });
+        });
+
+      for (i = 0; i <= allSongsDetails.length; i++) {
+        newSongs.push(await allSongsDetails[i]);
+      }
+    } else if (spotifyPlaylist) {
+      videos = playlist.tracks.items.slice(0, size).map((song) => {
+        return {
+          title: song.track.name,
+          url: song.track.external_urls.spotify,
+          duration: song.track.duration_ms / 1000,
+          artist: song.track.artists.map((artist) => artist.name).join(", "),
+          thumbnail: song.track.album.images[1].url,
+          requested: interaction.user,
+        };
+      });
+      newSongs = videos;
+      playlist = {
+        title: playlist.name,
+        url: playlist.external_urls.spotify,
+        thumbnail: playlist.images[1].url,
+      };
+    } else if (spotifyAlbum) {
+      videos = playlist.tracks.items.slice(0, size).map((song) => {
+        return {
+          title: song.name,
+          url: song.external_urls.spotify,
+          duration: song.duration_ms / 1000,
+          artist: song.artists.map((artist) => artist.name).join(", "),
+          thumbnail: playlist.images[1].url,
+          requested: interaction.user,
+        };
+      });
+      newSongs = videos;
+      playlist = {
+        title: playlist.name,
+        url: playlist.external_urls.spotify,
+        thumbnail: playlist.images[1].url,
+      };
     }
 
     const queueConstruct = {

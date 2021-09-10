@@ -40,11 +40,9 @@ module.exports = {
     const urlValid = videoPattern.test(search);
     const spotifyUrl = spotifyPattern.test(search);
 
-    if (playlistPattern) {
+    if (playlistPattern || spotifyPlaylistPattern.test(search) || spotifyAlbumPattern.test(search))
       return client.commands.get("playlist").execute(client, interaction);
-    } else if (spotifyPlaylistPattern.test(search)) {
-      return client.commands.get("playlist").execute(client, interaction);
-    }
+
     let song = null;
     let songInfo = null;
 
