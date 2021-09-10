@@ -8,7 +8,7 @@ const data = new SlashCommandBuilder().setName("join").setDescription("Bot join 
 module.exports = {
   data,
   category: "Music",
-  async execute(client, interaction, byBot) {
+  async execute(client, interaction, byBot, ready) {
     const { channel } = interaction.member.voice;
     const botChannel = interaction.guild.me.voice.channel;
 
@@ -50,6 +50,8 @@ module.exports = {
       guildId: channel.guild.id,
       adapterCreator: channel.guild.voiceAdapterCreator,
     });
+
+    if (byBot) ready(true);
 
     if (!byBot) {
       connection.on(
