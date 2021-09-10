@@ -2,7 +2,6 @@ const fs = require("fs");
 const { join } = require("path");
 const { REST } = require("@discordjs/rest");
 const { Routes } = require("discord-api-types/v9");
-const { token } = require("./config.json");
 
 //for development
 const clientId = "807492889209733142";
@@ -23,7 +22,7 @@ categoryFolders.forEach((category) => {
   }
 });
 
-const rest = new REST({ version: "9" }).setToken(token);
+const rest = new REST({ version: "9" }).setToken(process.env.token);
 
 (async () => {
   try {

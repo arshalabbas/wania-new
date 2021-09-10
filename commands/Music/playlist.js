@@ -7,7 +7,6 @@ const ytdl = require("ytdl-core");
 const musicPlayer = require("../../utils/musicPlayer");
 const { randomColor } = require("../../utils/colors");
 const { getVoiceConnection } = require("@discordjs/voice");
-const { spotifyClientId, spotifyToken } = require("../../config");
 
 const data = new SlashCommandBuilder()
   .setName("playlist")
@@ -63,7 +62,10 @@ module.exports = {
     let spotify = null;
 
     if (spotifyPlaylist || spotifyAlbum)
-      spotify = new Spotify({ clientID: spotifyClientId, clientSecret: spotifyToken });
+      spotify = new Spotify({
+        clientID: process.env.spotifyClientId,
+        clientSecret: process.env.spotifyToken,
+      });
 
     await interaction.reply({ content: `🔍 **searching:** \`${search}\`` });
 

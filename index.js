@@ -1,10 +1,10 @@
 const { Client, Collection } = require("discord.js");
 const fs = require("fs");
 const { join } = require("path");
-const { token, radioToken } = require("./config.js");
 
 const client = new Client({ intents: 32767 });
 const radioClient = new Client({ intents: 32767 });
+require("dotenv").config();
 
 client.radioClient = radioClient;
 client.commands = new Collection();
@@ -47,5 +47,5 @@ radioClient.on("ready", () => {
 
 // })
 
-client.login(token);
-radioClient.login(radioToken);
+client.login(process.env.token);
+radioClient.login(process.env.radioToken);

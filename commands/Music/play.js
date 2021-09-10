@@ -7,7 +7,6 @@ const YouTube = require("youtube-sr").default;
 const { errorEmbed, images, canModifyQueue } = require("../../utils/global");
 const { randomColor } = require("../../utils/colors");
 const musicPlayer = require("../../utils/musicPlayer");
-const { spotifyClientId, spotifyToken } = require("../../config");
 
 const data = new SlashCommandBuilder()
   .setName("play")
@@ -67,7 +66,10 @@ module.exports = {
       }
     } else if (spotifyUrl) {
       try {
-        const spotify = new Spotify({ clientID: spotifyClientId, clientSecret: spotifyToken });
+        const spotify = new Spotify({
+          clientID: process.env.spotifyClientId,
+          clientSecret: process.env.spotifyToken,
+        });
         songInfo = await spotify.getTrackByURL(search);
         song = {
           title: songInfo.name,
