@@ -116,6 +116,11 @@ module.exports = {
       song.requested = interaction.user;
 
       if (serverQueue) {
+        const checkExistance = serverQueue.songs.filter((track) => track.url === song.url);
+        if (checkExistance.length)
+          return await interaction.editReply({
+            embeds: [errorEmbed("This song is already in queue")],
+          });
         serverQueue.songs.push(song);
         const embed = new MessageEmbed()
           .setAuthor(`✅ Added to queue!`, images.waniaSwing)
