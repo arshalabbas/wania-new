@@ -18,7 +18,7 @@ const data = new SlashCommandBuilder()
 module.exports = {
   data,
   category: "Music",
-  async execute(client, interaction) {
+  async execute(client, interaction, sendSongByBot) {
     client.commands.get("join").execute(client, interaction, true, async (ready) => {
       if (!ready) return;
 
@@ -30,7 +30,8 @@ module.exports = {
           ephemeral: true,
         });
 
-      const search = interaction.options.getString("search");
+      let search = interaction.options.getString("search");
+      if (sendSongByBot) search = sendSongByBot;
       const videoPattern = /^(https?:\/\/)?(www\.)?(m\.)?(youtube\.com|youtu\.?be)\/.+$/gi;
       const playlistPattern = YouTube.isPlaylist(search);
       const spotifyPattern = /(?<=https:\/\/open\.spotify\.com\/track\/)([a-zA-Z0-9]{15,})/g;
@@ -51,7 +52,7 @@ module.exports = {
       let song = null;
       let songInfo = null;
 
-      await interaction.reply({ content: `🔍 **searching:** \`${search}\`` });
+      if (!sendSongByBot) await interaction.reply({ content: `🔍 **searching:** \`${search}\`` });
 
       if (urlValid) {
         try {
