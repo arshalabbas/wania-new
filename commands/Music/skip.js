@@ -19,7 +19,6 @@ module.exports = {
 
     serverQueue.playing = true;
     serverQueue.player.stop();
-    await interaction.reply({ content: "⏭️ You skipped the song", ephemeral: true });
-    await serverQueue.textChannel.send({ content: `<@${interaction.user.id}> skipped the song.` });
+    await interaction.reply({ content: "⏭️ You skipped the song" });
   },
 };
