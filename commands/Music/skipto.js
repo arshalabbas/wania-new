@@ -30,7 +30,7 @@ module.exports = {
 
     const index = interaction.options.getNumber("index");
 
-    if (index > serverQueue.songs.length - 1)
+    if (index > serverQueue.songs.length - 1 || index < 1)
       return await interaction.reply({
         embeds: [errorEmbed(`Only ${serverQueue.songs.length - 1} songs in queue.`)],
         ephemeral: true,
