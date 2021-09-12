@@ -8,6 +8,7 @@ const clientId = "807492889209733142";
 const guildId = "779549784712544286";
 
 const commands = [];
+const devCommands = [];
 
 const categoryFolders = fs.readdirSync(join(__dirname, "commands"));
 
@@ -18,7 +19,12 @@ categoryFolders.forEach((category) => {
 
   for (const file of commandFiles) {
     const command = require(`./commands/${category}/${file}`);
-    commands.push(command.data.toJSON());
+
+    if (command.category === "Developer") {
+      devCommands.push(command.data.toJSON());
+    } else {
+      commands.push(command.data.toJSON());
+    }
   }
 });
 
@@ -27,9 +33,9 @@ const rest = new REST({ version: "9" }).setToken(process.env.token);
 (async () => {
   try {
     console.log("Starting registering commands");
-    await rest.put(Routes.applicationGuildCommands(clientId, guildId), { body: commands });
+    await rest.put(Routes.applicationCommands(clientId), { body: commands });
+    await rest.put(Routes.applicationGuildCommands(clientId, guildId), { body: devCommands });
     console.log("Successfully registered all commands");
-    console.table(commands);
   } catch (error) {
     console.error(error);
   }

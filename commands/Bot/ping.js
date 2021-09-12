@@ -25,27 +25,37 @@ module.exports = {
       radio: null,
     };
 
-    try {
-      const member = await interaction.guild.members.fetch(client.radioClient.user.id);
+    /*
+     * Temporay code until the Wania Radio is ready
+     */
 
-      if (member) {
-        ping.radio = Math.round(client.radioClient.ws.ping);
-      }
-    } catch {
-      ping.radio = null;
-    }
+    embed.setDescription(`${ping.music > 150 ? statusDanger : statusSuccess} \`${ping.music} ms\``);
 
-    embed.addFields([
-      { name: `${statusSuccess} ${client.user.username}`, value: `\`${ping.music} ms\`` },
-      {
-        name: `${ping.radio ? statusSuccess : statusDanger} ${client.radioClient.user.username}`,
-        value: `${
-          ping.radio
-            ? `\`${ping.radio} ms\``
-            : `[Please invite my radio :(](${botInviteURL(client.radioClient.user.id)})`
-        }`,
-      },
-    ]);
+    /*
+     * Implement the above commented code when wania Radio is ready
+     */
+
+    // try {
+    //   const member = await interaction.guild.members.fetch(client.radioClient.user.id);
+
+    //   if (member) {
+    //     ping.radio = Math.round(client.radioClient.ws.ping);
+    //   }
+    // } catch {
+    //   ping.radio = null;
+    // }
+
+    // embed.addFields([
+    //   { name: `${statusSuccess} ${client.user.username}`, value: `\`${ping.music} ms\`` },
+    //   {
+    //     name: `${ping.radio ? statusSuccess : statusDanger} ${client.radioClient.user.username}`,
+    //     value: `${
+    //       ping.radio
+    //         ? `\`${ping.radio} ms\``
+    //         : `[Please invite my radio :(](${botInviteURL(client.radioClient.user.id)})`
+    //     }`,
+    //   },
+    // ]);
 
     await interaction.editReply({ embeds: [embed] });
   },

@@ -1,4 +1,4 @@
-const accentColors = ["#7f606b", "#eeb4cc", "#df7191", "#7b334d", "#742e43", "#393032"];
+const accentColors = ["#7f606b", "#eeb4cc", "#df7191", "#7b334d", "#742e43"];
 
 module.exports = {
   primary: "#df7191",

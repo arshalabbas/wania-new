@@ -3,10 +3,10 @@ const fs = require("fs");
 const { join } = require("path");
 
 const client = new Client({ intents: 32767 });
-const radioClient = new Client({ intents: 32767 });
+//const radioClient = new Client({ intents: 32767 });
 require("dotenv").config();
 
-client.radioClient = radioClient;
+//client.radioClient = radioClient;
 client.commands = new Collection();
 client.queue = new Map();
 
@@ -39,13 +39,10 @@ categoryFolders.forEach((category) => {
   }
 });
 
-radioClient.on("ready", () => {
-  console.log(`${radioClient.user.username} is with ${client.user.username}`);
-});
+// radioClient.on("ready", () => {
+//   console.log(`${radioClient.user.username} is with ${client.user.username}`);
+// });
 
-// client.on("interaction", (interaction) => {
-
-// })
 process.setMaxListeners(0);
 client.login(process.env.token);
-radioClient.login(process.env.radioToken);
+//radioClient.login(process.env.radioToken);
