@@ -111,7 +111,7 @@ module.exports = {
         k += 10;
 
         const info = current
-          .filter((track) => queue[0].url !== track.url)
+          .filter((track, index) => index !== 0)
           .map(
             (track) => `${++j} - **[${track.title}](${track.url})** - \`${track.requested.tag}\``
           )
