@@ -26,7 +26,8 @@ module.exports = {
 
     interaction.reply({ embeds: [embeds[currentPage]], components: [row] });
 
-    const filter = (i) => i.user.id === interaction.user.id;
+    const filter = (i) =>
+      i.user.id === interaction.user.id && i.message.interaction.id === interaction.id;
     const collector = interaction.channel.createMessageComponentCollector({ filter, time: 60000 });
 
     collector.on("collect", async (i) => {
@@ -102,7 +103,7 @@ module.exports = {
 
     function generateEmbeds(queue) {
       let embeds = [];
-      let k = 11;
+      let k = 10;
 
       for (let i = 0; i < queue.length; i += 10) {
         const current = queue.slice(i, k);
@@ -122,7 +123,9 @@ module.exports = {
           .setThumbnail(queue[0].thumbnail)
           .setColor(randomColor())
           .setDescription(
-            `**[${queue[0].title}](${queue[0].url})** - \`${queue[0].requested.tag}\`\n\n__Up Next__\n${info}`
+            `**[${queue[0].title}](${queue[0].url})** - \`${
+              queue[0].requested.tag
+            }\`\n\n__Up Next__\n${info.length === 0 ? "_Nothing in queue_" : info}`
           );
         embeds.push(embed);
       }

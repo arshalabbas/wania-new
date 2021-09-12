@@ -28,7 +28,9 @@ module.exports = {
     const { channel } = interaction.member.voice;
     const botChannel = interaction.guild.me.voice.channel;
 
-    if (channel !== botChannel) return;
+    if (!channel) return false;
+
+    if (channel !== botChannel) return false;
 
     return true;
   },

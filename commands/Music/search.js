@@ -1,4 +1,4 @@
-const { SlashCommandBuilder } = require("@discordjs/builders");
+const { SlashCommandBuilder, inlineCode } = require("@discordjs/builders");
 const { MessageActionRow, MessageSelectMenu, MessageButton, MessageEmbed } = require("discord.js");
 const YouTube = require("youtube-sr").default;
 const { canModifyQueue, errorEmbed } = require("../../utils/global");
@@ -17,12 +17,21 @@ const data = new SlashCommandBuilder()
 
 module.exports = {
   data,
+  category: "Music",
   async execute(client, interaction) {
     const serverQueue = client.queue.get(interaction.guild.id);
+
+    const { channel } = interaction.member.voice;
 
     if (serverQueue && !canModifyQueue(interaction))
       return await interaction.reply({
         embeds: [errorEmbed(`You must be in the same channel as <@${client.user.id}>`)],
+        ephemeral: true,
+      });
+
+    if (!channel)
+      return await interaction.reply({
+        embeds: [errorEmbed("You need to join voice channel.")],
         ephemeral: true,
       });
 
@@ -53,7 +62,8 @@ module.exports = {
     const embed = new MessageEmbed()
       .setAuthor(client.user.username, client.user.displayAvatarURL())
       .setTitle("Your search results...")
-      .setColor(randomColor());
+      .setColor(randomColor())
+      .setDescription(inlineCode(query));
 
     const menuRow = new MessageActionRow().addComponents(
       new MessageSelectMenu()
@@ -73,7 +83,8 @@ module.exports = {
 
     await interaction.editReply({ embeds: [embed], components: [menuRow, buttonRow] });
 
-    const filter = (i) => i.user.id === interaction.user.id;
+    const filter = (i) =>
+      i.user.id === interaction.user.id && i.message.interaction.id === interaction.id;
     const collector = interaction.channel.createMessageComponentCollector({
       filter,
       time: 60000,

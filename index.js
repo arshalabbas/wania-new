@@ -46,6 +46,6 @@ radioClient.on("ready", () => {
 // client.on("interaction", (interaction) => {
 
 // })
-
+process.setMaxListeners(0);
 client.login(process.env.token);
 radioClient.login(process.env.radioToken);

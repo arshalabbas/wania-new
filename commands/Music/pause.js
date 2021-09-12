@@ -12,6 +12,8 @@ module.exports = {
     if (!serverQueue)
       return await interaction.reply({ embeds: [errorEmbed("Nothing playing right now.")] });
 
+    const { channel } = interaction.member.voice;
+
     if (!canModifyQueue(interaction))
       return { embeds: [errorEmbed(`You must be in the same channel as <@${client.user.id}>`)] };
 

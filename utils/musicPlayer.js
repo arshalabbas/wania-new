@@ -10,7 +10,6 @@ const {
 } = require("@discordjs/voice");
 const { MessageEmbed } = require("discord.js");
 const ytdl = require("ytdl-core");
-//const spdl = require("spdl-core").default;
 const YouTube = require("youtube-sr").default;
 const { randomColor } = require("./colors");
 const { errorEmbed, images } = require("./global");
@@ -130,7 +129,7 @@ async function musicPlayer(client, song, interaction) {
     queue.textChannel.send({
       embeds: [
         errorEmbed(
-          `error when trying to play the song [${metadata.title}](${metadata.url})\nrequestted by <@${metadata.requestedId}>`
+          `error when trying to play the song **[${metadata.title}](${metadata.url})**\nrequested by <@${metadata.requestedId}>`
         ),
       ],
     });
