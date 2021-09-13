@@ -3,10 +3,6 @@ const { join } = require("path");
 const { REST } = require("@discordjs/rest");
 const { Routes } = require("discord-api-types/v9");
 
-//for development
-const clientId = "807492889209733142";
-const guildId = "779549784712544286";
-
 const commands = [];
 const devCommands = [];
 
@@ -33,8 +29,10 @@ const rest = new REST({ version: "9" }).setToken(process.env.token);
 (async () => {
   try {
     console.log("Starting registering commands");
-    await rest.put(Routes.applicationCommands(clientId), { body: commands });
-    await rest.put(Routes.applicationGuildCommands(clientId, guildId), { body: devCommands });
+    await rest.put(Routes.applicationCommands(process.env.clientId), { body: commands });
+    await rest.put(Routes.applicationGuildCommands(process.env.clientId, process.env.devGuildId), {
+      body: devCommands,
+    });
     console.log("Successfully registered all commands");
   } catch (error) {
     console.error(error);
