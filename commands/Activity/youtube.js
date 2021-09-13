@@ -1,6 +1,6 @@
 const { SlashCommandBuilder } = require("@discordjs/builders");
 const { DiscordTogether } = require("discord-together");
-const { MessageEmbed, MessageActionRow, MessageButton } = require("discord.js");
+const { MessageActionRow, MessageButton } = require("discord.js");
 const { errorEmbed } = require("../../utils/global");
 
 const data = new SlashCommandBuilder()
