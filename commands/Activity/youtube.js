@@ -12,7 +12,7 @@ const data = new SlashCommandBuilder()
 
 module.exports = {
   data,
-  category: "Developer",
+  category: "Activity",
   async execute(client, interaction) {
     const channel = interaction.options.getChannel("vc");
 
